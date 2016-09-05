@@ -15,6 +15,6 @@ class LaundryCatalogueItemSerializer(serializers.ModelSerializer):
 class FoodCategorySerializer(serializers.ModelSerializer):
 	class Meta:
 		model = FoodCategory
-		fields = ( 'category','category_name','food' )
+		fields = ( 'category_id','category_name','food' )
 
 
