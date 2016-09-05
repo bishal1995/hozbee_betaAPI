@@ -21,6 +21,14 @@ class UnitProduct(models.Model):
 	tax_id = models.ForeignKey('sales.Tax')
 	revenue_id = models.ForeignKey('sales.Revenue')
 
+# Food Category
+class FoodCategory(models.Model):
+	category = models.AutoField(primary_key=True,db_index=True)
+	category_id = models.SmallIntegerField(null=True)
+	service_area = models.ForeignKey('sales.Area',null=True)
+	category_name = models.CharField(max_length=15)
+	food = models.ForeignKey('UnitProduct')
+
 # Product - Bundle Product
 class BundleProduct(models.Model):
 	products = models.ForeignKey('UnitProduct',primary_key=True,db_index=True)
@@ -72,14 +80,6 @@ class LaundryCatalogueItem(models.Model):
         choices=CLOTH_CHOICES,
     )
 
-# Food Category
-class FoodCategory(models.Model):
-	category = models.AutoField(primary_key=True,db_index=True)
-	category_name = models.CharField(max_length=15)
-	parent = models.ForeignKey('FoodCategory',null=True)
-	level = models.PositiveSmallIntegerField()
-	food = models.OneToOneField('UnitProduct')
-	service_area = models.ForeignKey('sales.Area',null=True)
 
 # Coupond
 class Coupon(models.Model):

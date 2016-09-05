@@ -266,37 +266,6 @@ class FoodTransactionConfirmation(APIView):
 	def dispatch(self, *args, **kwargs):
 		return super(FoodTransactionConfirmation, self).dispatch(*args, **kwargs)
 
-# Laundry Order
-class ConfirmLaundryOrder(APIView):
-	authentication_classes = (TokenAuthentication,)
-	permission_classes = (IsAuthenticated,)
-	throttle_classes = (UserRateThrottle,)
-
-	def put(self,request):
-		LaundryOrder = request.body
-		LaundryOrder = json.loads(LaundryOrder)
-		customer = CustomerDetails.objects.get(customer=request.user)
-		address_id = int(LaundryOrder['address'])
-		try:
-			address = Address.objects.get(pk=address_id)
-			seller = SellerDetails.objects.get(pk=1) # for codding purpose
-			service_requested = LaundryOrder['WD'] + LaundryOrder['WI'] + LaundryOrder['DW']
-			LaundryCorder(
-				customer = customer,
-				address = address,
-				service = service_requested,
-				seller = seller,
-			).save()
-			data = {'order':'PLACED_SUCESSFULLY'}
-			return Response(data,status=status.HTTP_200_OK)
-		except Address.DoesNotExist:
-			error = {'error':'INVALID_ADDRESS'}
-			return Response(error,status=status.HTTP_400_BAD_REQUEST)
-
-	@method_decorator(csrf_exempt)
-	def dispatch(self, *args, **kwargs):
-		return super(ConfirmLaundryOrder,self).dispatch(*args, **kwargs)
-
 
 # Get All Corders
 class FoodOrders(APIView):
@@ -343,6 +312,48 @@ class CorderDetails(APIView):
 	@method_decorator(csrf_exempt)
 	def dispatch(self, *args, **kwargs):
 		return super(CorderDetails, self).dispatch(*args, **kwargs)
+
+## LAUNDRY ORDERS
+
+# Laundry Order
+class ConfirmLaundryOrder(APIView):
+	authentication_classes = (TokenAuthentication,)
+	permission_classes = (IsAuthenticated,)
+	throttle_classes = (UserRateThrottle,)
+
+	def post(self,request):
+		LaundryOrder = request.body
+		LaundryOrder = json.loads(LaundryOrder)
+		customer = CustomerDetails.objects.get(customer=request.user)
+		address_id = int(LaundryOrder['address'])
+		try:
+			address = Address.objects.get(pk=int(LaundryOrder['address']))
+			seller = SellerDetails.objects.get(pk=1) # for codding purpose
+			service_requested = LaundryOrder['WF'] + LaundryOrder['WI'] + LaundryOrder['DW'] + LaundryOrder['PW']
+			newLaundryOrder = LaundryCorder()
+			newLaundryOrder.customer = customer
+			newLaundryOrder.address = address
+			newLaundryOrder.service = service_requested
+			newLaundryOrder.seller = seller
+			newLaundryOrder.pickup_Date = LaundryOrder['date']
+			newLaundryOrder.save()
+			# Confirmed order data
+			cnfdorder = {}
+			cnfdorder['id'] = newLaundryOrder.corder
+			cnfdorder['pickupDate'] = newLaundryOrder.pickup_Date
+			cnfdorder['address'] = LaundryOrder['address']
+			cnfdorder['reqService'] = newLaundryOrder.service
+			# Sending confirmed data
+			data = {'order_info': cnfdorder }
+			return Response(data,status=status.HTTP_200_OK)
+		except Address.DoesNotExist:
+			error = {'error':'INVALID_ADDRESS'}
+			return Response(error,status=status.HTTP_400_BAD_REQUEST)
+
+	@method_decorator(csrf_exempt)
+	def dispatch(self, *args, **kwargs):
+		return super(ConfirmLaundryOrder,self).dispatch(*args, **kwargs)
+
 
 # Get Laundry Order Details
 class LaundryOrders(APIView):

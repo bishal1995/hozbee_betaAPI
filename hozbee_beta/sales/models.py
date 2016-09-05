@@ -71,12 +71,13 @@ class LaundryCorder(models.Model):
 	corder = models.AutoField(primary_key=True,db_index=True)
 	customer = models.ForeignKey('users.CustomerDetails')
 	address = models.ForeignKey('users.Address')
-	service = models.CharField(max_length=3,default='000')
-	seller = models.ForeignKey('serviceproviders.SellerDetails')
-	date = models.DateField(auto_now_add=True)
+	service = models.CharField(max_length=5,default='0000')
+	seller = models.ForeignKey('serviceproviders.SellerDetails',null=True)
+	pickup_Date = models.DateField(auto_now_add=False,null=True)
+	date = models.DateField(auto_now_add=True)						# Created
 	time = models.TimeField(auto_now_add=True)
-	status = models.CharField(max_length=2,default='AA')
-	identifier = models.CharField(max_length=64,default='SOME_UNIQUE_VALUE')
+	status = models.CharField(max_length=2,default='AA')			# Different status
+	identifier = models.CharField(max_length=64,default='SOME_UNIQUE_VALUE',null=True)
 	shipment = models.OneToOneField('Shipment',null=True)
 	invoice = models.OneToOneField('Invoice',null=True)
 	transaction = models.OneToOneField('Transaction',null=True)

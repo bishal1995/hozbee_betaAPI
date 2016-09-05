@@ -22,4 +22,3 @@ class LaundryCorderSerializer(serializers.ModelSerializer):
 		fields = ( 'address','service','date','time','status' )
 
 
-
